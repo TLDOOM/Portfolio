@@ -172,7 +172,7 @@ let showHidden = false
   function handleMouseEnter() {
     hoverTimeout = setTimeout(() => {
       showHidden = true
-    }, 500)
+    }, 5000)
   }
 
   function handleMouseLeave() {
