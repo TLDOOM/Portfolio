@@ -8,8 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Clean install to avoid Rollup optional dependency errors
-RUN rm -rf node_modules package-lock.json \
-    && npm install
+RUN npm ci
 
 # Copy the rest of the source code
 COPY . .

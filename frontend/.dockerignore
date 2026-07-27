@@ -1,0 +1,14 @@
+node_modules
+.svelte-kit
+build
+dist
+.storybook
+storybook-static
+.vscode
+.git
+.gitignore
+Dockerfile
+README.md
+npm-debug.log
+coverage
+*.log
