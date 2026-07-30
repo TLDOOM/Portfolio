@@ -52,5 +52,24 @@ def insert_project():
         db.close()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":import os
+
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+
+def test_projects_endpoint_returns_response():
+    response = client.get("/projects")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+def test_future_endpoint_returns_response():
+    response = client.get("/future")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
     insert_project()
