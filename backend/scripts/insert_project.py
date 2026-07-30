@@ -5,14 +5,12 @@ from sqlalchemy.orm import sessionmaker
 from app.core.db import Base
 from app.models.projects import Projects
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///./test.db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
+# Create tables for this manual script only
 Base.metadata.create_all(bind=engine)
 
 
@@ -27,14 +25,14 @@ def insert_project():
         new_project = Projects(
             name=name,
             project_type=project_type,
-            project_description=project_description
+            project_description=project_description,
         )
 
         db.add(new_project)
         db.commit()
         db.refresh(new_project)
 
-        print(f"\nProject inserted successfully with ID: {new_project.id}")
+        print(f"\n✅ Project inserted successfully with ID: {new_project.id}")
 
     except Exception as e:
         db.rollback()
