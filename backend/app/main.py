@@ -31,7 +31,9 @@ app.add_middleware(
 )
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
 app.include_router(user.router, prefix="/api/v1")
 app.include_router(projects.router, prefix ="/api/v1")
