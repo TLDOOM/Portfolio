@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: portfolio-db
+    container_name: portfolio-db-dev
     restart: unless-stopped
 
     environment:
@@ -9,8 +9,11 @@ services:
       POSTGRES_PASSWORD: portfolio
       POSTGRES_DB: portfolio
 
+    ports:
+      - "5432:5432"
+
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_dev:/var/lib/postgresql/data
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
@@ -22,15 +25,18 @@ services:
     build:
       context: ./backend
 
-    container_name: portfolio-backend
+    container_name: portfolio-backend-dev
     restart: unless-stopped
 
     depends_on:
       db:
         condition: service_healthy
 
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./backend:/app
 
     environment:
       DATABASE_URL: "postgresql+psycopg2://portfolio:portfolio@db:5432/portfolio"
@@ -42,26 +48,38 @@ services:
       - 0.0.0.0
       - --port
       - "8000"
-      - --workers
-      - "2"
-      - --proxy-headers
-      - --forwarded-allow-ips=*
+      - --reload
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        PUBLIC_API_URL: /api
+      context: ./frontend
+      dockerfile: Dockerfile.dev
 
-    container_name: portfolio-frontend
+    container_name: portfolio-frontend-dev
     restart: unless-stopped
 
     depends_on:
       - backend
 
     ports:
-      - "80:80"
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    environment:
+      PUBLIC_API_URL: "http://localhost:8000"
+
+    command:
+      - npm
+      - run
+      - dev
+      - --
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5173"
 
 volumes:
-  pgdata:
+  pgdata_dev:

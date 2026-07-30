@@ -1,20 +1,27 @@
-# Use official Node.js image
-FROM node:20
+# Build the SvelteKit static website
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy only package files first (for caching)
-COPY package*.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Clean install to avoid Rollup optional dependency errors
 RUN npm ci
 
-# Copy the rest of the source code
-COPY . .
+COPY frontend/ ./
 
-# Expose SvelteKit dev server port
-EXPOSE 5173
+ARG PUBLIC_API_URL=/api
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
 
-# Start SvelteKit dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+RUN npm run build
+
+
+# Serve the compiled website through Nginx
+FROM nginx:1.27-alpine
+
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
