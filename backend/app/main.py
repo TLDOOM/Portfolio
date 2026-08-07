@@ -9,6 +9,9 @@ from app.v1.routes import user, projects, future
 
 app = FastAPI(title="Portfolio Backend")
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 def get_db():
     db = SessionLocal()
@@ -46,6 +49,7 @@ app.include_router(future.router, prefix="/api/v1")
 @app.get("/projects")
 def read_project(db: Session = Depends(get_db)):
     return db.query(Projects).all()
+
 
 
 @app.get("/future")

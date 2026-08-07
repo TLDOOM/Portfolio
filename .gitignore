@@ -65,6 +65,9 @@ build/
 
 # Ignore local PostgreSQL data if stored in project
 pgdata/
+__pycache__/
+*.pyc
+portfolio_dump.sql
 
 # ------------------------------
 # Storybook
